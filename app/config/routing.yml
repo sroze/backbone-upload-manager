@@ -1,0 +1,5 @@
+s_roze_io_upload_handler:
+    resource: "@SRozeIOUploadHandlerBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
