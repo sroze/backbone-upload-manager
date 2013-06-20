@@ -12,6 +12,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    const PARAMETER_UPLOAD_ROOT_DIR = 'srozeio_upload_root_dir';
+    
     /**
      * {@inheritDoc}
      */
@@ -20,9 +22,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('s_roze_io_upload_handler');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+            ->children()
+            ->scalarNode('upload_root_dir')->isRequired()->end()
+            ->end();
 
         return $treeBuilder;
     }

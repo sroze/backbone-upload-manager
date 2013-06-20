@@ -4,17 +4,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <!--
     <parameters>
-        <parameter key="s_roze_io_upload_handler.example.class">SRozeIO\UploadHandlerBundle\Example</parameter>
+        <parameter key="srozeio.upload_handler.class">SRozeIO\UploadHandlerBundle\Model\UploadHandler</parameter>
     </parameters>
 
     <services>
-        <service id="s_roze_io_upload_handler.example" class="%s_roze_io_upload_handler.example.class%">
-            <argument type="service" id="service_id" />
-            <argument>plain_value</argument>
-            <argument>%parameter_name%</argument>
-        </service>
+        <service id="srozeio.upload_handler" class="%srozeio.upload_handler.class%"></service>
     </services>
-    -->
 </container>

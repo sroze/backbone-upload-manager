@@ -167,6 +167,7 @@ class appDevDebugProjectContainer extends Container
             'session.storage.native' => 'getSession_Storage_NativeService',
             'session.storage.php_bridge' => 'getSession_Storage_PhpBridgeService',
             'session_listener' => 'getSessionListenerService',
+            'srozeio.upload_handler' => 'getSrozeio_UploadHandlerService',
             'streamed_response_listener' => 'getStreamedResponseListenerService',
             'swiftmailer.email_sender.listener' => 'getSwiftmailer_EmailSender_ListenerService',
             'swiftmailer.plugin.messagelogger' => 'getSwiftmailer_Plugin_MessageloggerService',
@@ -2079,6 +2080,19 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
+     * Gets the 'srozeio.upload_handler' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return SRozeIO\UploadHandlerBundle\Model\UploadHandler A SRozeIO\UploadHandlerBundle\Model\UploadHandler instance.
+     */
+    protected function getSrozeio_UploadHandlerService()
+    {
+        return $this->services['srozeio.upload_handler'] = new \SRozeIO\UploadHandlerBundle\Model\UploadHandler();
+    }
+
+    /**
      * Gets the 'streamed_response_listener' service.
      *
      * This service is shared.
@@ -2837,6 +2851,7 @@ class appDevDebugProjectContainer extends Container
         $instance->addPath('/Users/samuel/git/backbone-upload-manager/vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/Resources/views', 'Twig');
         $instance->addPath('/Users/samuel/git/backbone-upload-manager/vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/Resources/views', 'Swiftmailer');
         $instance->addPath('/Users/samuel/git/backbone-upload-manager/vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/Resources/views', 'Doctrine');
+        $instance->addPath('/Users/samuel/git/backbone-upload-manager/src/SRozeIO/UploadHandlerBundle/Resources/views', 'SRozeIOUploadHandler');
         $instance->addPath('/Users/samuel/git/backbone-upload-manager/vendor/symfony/symfony/src/Symfony/Bundle/WebProfilerBundle/Resources/views', 'WebProfiler');
         $instance->addPath('/Users/samuel/git/backbone-upload-manager/vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/views', 'SensioDistribution');
         $instance->addPath('/Users/samuel/git/backbone-upload-manager/app/Resources/views');
@@ -3257,7 +3272,7 @@ class appDevDebugProjectContainer extends Container
             'kernel.root_dir' => '/Users/samuel/git/backbone-upload-manager/app',
             'kernel.environment' => 'dev',
             'kernel.debug' => true,
-            'kernel.name' => 'app',
+            'kernel.name' => 'ap_',
             'kernel.cache_dir' => '/Users/samuel/git/backbone-upload-manager/app/cache/dev',
             'kernel.logs_dir' => '/Users/samuel/git/backbone-upload-manager/app/logs',
             'kernel.bundles' => array(
@@ -3269,6 +3284,7 @@ class appDevDebugProjectContainer extends Container
                 'AsseticBundle' => 'Symfony\\Bundle\\AsseticBundle\\AsseticBundle',
                 'DoctrineBundle' => 'Doctrine\\Bundle\\DoctrineBundle\\DoctrineBundle',
                 'SensioFrameworkExtraBundle' => 'Sensio\\Bundle\\FrameworkExtraBundle\\SensioFrameworkExtraBundle',
+                'SRozeIOUploadHandlerBundle' => 'SRozeIO\\UploadHandlerBundle\\SRozeIOUploadHandlerBundle',
                 'WebProfilerBundle' => 'Symfony\\Bundle\\WebProfilerBundle\\WebProfilerBundle',
                 'SensioDistributionBundle' => 'Sensio\\Bundle\\DistributionBundle\\SensioDistributionBundle',
                 'SensioGeneratorBundle' => 'Sensio\\Bundle\\GeneratorBundle\\SensioGeneratorBundle',
@@ -3737,6 +3753,8 @@ class appDevDebugProjectContainer extends Container
             'sensio_framework_extra.converter.doctrine.class' => 'Sensio\\Bundle\\FrameworkExtraBundle\\Request\\ParamConverter\\DoctrineParamConverter',
             'sensio_framework_extra.converter.datetime.class' => 'Sensio\\Bundle\\FrameworkExtraBundle\\Request\\ParamConverter\\DateTimeParamConverter',
             'sensio_framework_extra.view.listener.class' => 'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\TemplateListener',
+            'srozeio_upload_root_dir' => '/Users/samuel/git/backbone-upload-manager/app/Resources/uploads/',
+            'srozeio.upload_handler.class' => 'SRozeIO\\UploadHandlerBundle\\Model\\UploadHandler',
             'web_profiler.controller.profiler.class' => 'Symfony\\Bundle\\WebProfilerBundle\\Controller\\ProfilerController',
             'web_profiler.controller.router.class' => 'Symfony\\Bundle\\WebProfilerBundle\\Controller\\RouterController',
             'web_profiler.controller.exception.class' => 'Symfony\\Bundle\\WebProfilerBundle\\Controller\\ExceptionController',

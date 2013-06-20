@@ -63,3 +63,8 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
     spool:     { type: memory }
+
+# Upload handler configuration
+s_roze_io_upload_handler:
+    upload_root_dir: %kernel.root_dir%/Resources/uploads/
+    
