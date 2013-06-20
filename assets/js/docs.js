@@ -1,0 +1,7 @@
+/**
+ * Documentation JS.
+ * 
+ */
+$(function(){
+    prettyPrint();
+});

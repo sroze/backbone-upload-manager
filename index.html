@@ -1,1 +1,150 @@
-<h1>Welcome</h1>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Backbone Upload Manager</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <!-- Le styles -->
+        <link href="assets/css/vendor/1-bootstrap-2.3.1.css" rel="stylesheet" />
+        <link href="assets/css/vendor/2-bootstrap-responsive-2.3.1.css" rel="stylesheet" />
+        <link href="assets/css/vendor/3-prettify.css" rel="stylesheet" />
+        <link href="assets/css/docs.css" rel="stylesheet" />
+
+        <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="assets/js/html5shiv.js"></script>
+        <![endif]-->
+        
+        <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+        ga('create', 'UA-41885358-2', 'sroze.github.io');
+        ga('send', 'pageview');
+        </script>
+    </head>
+
+    <body>
+        <div class="jumbotron masthead">
+            <div class="container">
+                <img src="assets/images/logo.png" />
+                <h1>Backbone Upload Manager</h1>
+                <p>Simple backbone upload manager, based on <a href="https://github.com/blueimp/jQuery-File-Upload/wiki/Basic-plugin">jQuery FileUpload Basic Plugin</a>.</p>
+                <p>
+                    <a href="https://github.com/sroze/backbone-upload-manager" class="btn btn-primary btn-large">View on GitHub</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="bs-docs-social">
+            <div class="container">
+                <ul class="bs-docs-social-buttons">
+                    <li>
+                        <iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=sroze&repo=backbone-upload-manager&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container">
+        
+            <div class="demonstration">
+        
+                <h1>Demonstration</h1>
+        
+                <div class="row-fluid">
+                    <div class="span6">
+                        <h2>Upload Manager</h2>
+                        <p>This is a demonstration of the backbone upload manager, based on <a href="http://backbonejs.org">Backbone.js</a> and <a href="https://github.com/blueimp/jQuery-File-Upload/wiki/Basic-plugin">jQuery Upload File Basic</a>.</p>
+                    </div>
+                    <div class="span6">
+                        <h2>Uploaded files</h2>
+                        <p>Here are displayed the uploaded files on the server. The list is updated each time that a file is successfully uploaded.</p>
+                    </div>
+                </div>
+        
+                <hr class="soften">
+        
+                <div class="row-fluid">
+                    <div class="span6">
+<pre class="prettyprint lang-javascript linenums">
+// Create the upload manager
+var uploadManager = new Backbone.UploadManager();
+
+// Render it
+uploadManager.renderTo($('div#manager-area'));
+</pre>
+                    </div>
+                    <div class="span6">
+<pre class="prettyprint lang-javascript linenums">
+// On file uploaded, refresh list.
+uploadManager.on('uploaded', function () {
+    $.get('/files').done(function(result){
+        var target = $('ul#file-list').empty();
+        
+        $.each(result, function (index, file)) {
+            target.append(
+                '&lt;li&gt;'+file.name+' ('+file.size+')&lt;/li&gt;'
+            );
+        }
+    });
+});
+</pre>
+                    </div>
+                </div>
+        
+            </div>
+            
+        
+            <div class="server-side">
+        
+                <h1>Server-side</h1>
+        
+                <div class="row-fluid">
+                    <div class="span6">
+                        <h2>Upload Handler</h2>
+                        <p>There's an <strong>upload handler</strong> coming with Backbone Upload Manager. It's just a simple PHP class that handles uploads.</p>
+                        <p><strong>Note:</strong> the demonstration handler is a Symfony2 application hosted on a PHP Google App Engine, that you can found in the <code>gae-handler</code> branch of GitHub repository.</p>
+                    </div>
+                    <div class="span6">
+                        <h2>Symfony2 integration</h2>
+                        <p>You can simply integrate this handler by making it as a service. For instance, if you put the handler class in <code>Acme\DemoBundle\Model\UploadHandler</code>, your service looks like:</p>
+                        <pre class="prettyprint lang-xml linenums">&lt;service 
+    id="acme.demo.upload_handler" 
+    class="Acme\DemoBundle\Model\UploadHandler"&gt;
+&lt;/service&gt;</pre>
+                        <p>Then, in your controller, you simply have to do:</p>
+                        <pre class="prettyprint lang-php linenums">try {
+    // Handle file uploads
+    $files = $this-&gt;get('acme.demo.upload_handler')-&gt;handle(array(
+        'root_path' =&gt; '/some/path/that/may/be/configured/as/bundle/config',
+        'param_name' =&gt; 'files'
+    ));
+    
+    return JsonResponse($files);
+} catch (UploadException $e) {
+    throw new HttpException(400, $e-&gt;getMessage());
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <p>Designed and built with love by <a href="http://github.com/sroze" target="_blank">@sroze</a>.</p>
+                <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+            </div>
+        </footer>
+
+        <script type="text/javascript" src="assets/js/vendor/1-jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/2-bootstrap-2.3.1.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/prettify.js"></script>
+        <script type="text/javascript" src="assets/js/docs.js"></script>
+    </body>
+</html>

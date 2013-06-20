@@ -1,0 +1,84 @@
+.jumbotron:after {
+    background: url("../images/bs-docs-masthead-pattern.png") repeat scroll center center transparent;
+    bottom: 0;
+    content: "";
+    display: block;
+    left: 0;
+    opacity: 0.4;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.jumbotron {
+	background: #287c07; /* Old browsers */
+	background: -moz-linear-gradient(left, #287c07 0%, #68b733 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,#287c07), color-stop(100%,#68b733)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left, #287c07 0%,#68b733 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left, #287c07 0%,#68b733 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(left, #287c07 0%,#68b733 100%); /* IE10+ */
+	background: linear-gradient(to right, #287c07 0%,#68b733 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#287c07', endColorstr='#68b733',GradientType=1 ); /* IE6-9 */
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2) inset, 0 -3px 7px rgba(0, 0, 0, 0.2) inset;
+    color: #FFFFFF;
+    padding: 40px 0;
+    position: relative;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 0, 0, 0.075);
+}
+.jumbotron .container {
+    position: relative;
+    z-index: 2;
+}
+.jumbotron .btn-large {
+	margin-top: 20px;
+}
+.jumbotron a:not(.btn) {
+    color: #fefefe;
+}
+.bs-docs-social {
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #DDDDDD;
+    border-top: 1px solid #FFFFFF;
+    padding: 15px 0;
+    text-align: center;
+}
+.bs-docs-social-buttons {
+    list-style: none outside none;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-left: 0;
+}
+.bs-docs-social-buttons li {
+    display: inline-block;
+    line-height: 1;
+    padding: 5px 8px;
+}
+.demonstration, .server-side {
+    color: #5A5A5A;
+}
+.demonstration, .server-side h2 {
+    text-align: center;
+}
+.demonstration h1, .server-side h1 {
+    font-size: 60px;
+    font-weight: 200;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin: 60px 0 30px;
+    text-align: center;
+}
+pre {
+	text-align: left;
+	overflow: auto;
+}
+.footer {
+    background-color: #F5F5F5;
+    border-top: 1px solid #E5E5E5;
+    margin-top: 70px;
+    padding: 30px 0;
+    text-align: center;
+}
+.footer p {
+    color: #777777;
+    margin-bottom: 0;
+}
