@@ -1,0 +1,13 @@
+<h3 class="popover-title">Upload files</h3>
+<div class="popover-content" id="file-list">
+    <div class="no-data"><em>Add files.</em></div>
+</div>
+<footer>
+    <button class="btn btn-warning pull-right" id="cancel-uploads-button"><i class="icon-cancel"></i>Cancel uploads</button>
+    <span class="btn btn-success fileinput-button" id="fileinput-button">
+        <i class="icon-plus"></i>
+        <span>Add files...</span>
+        <input id="fileupload" type="file" name="files[]" multiple="multiple">
+    </span>
+    <button class="btn btn-primary" id="start-uploads-button"><i class="icon-start"></i>Start uploads</button>
+</footer>

@@ -1,0 +1,13 @@
+<div class="span6"><span class="name"><%= name %></span></div>
+<div class="span3">
+    <span class="size"><%= displaySize(size) %></span>
+    <div class="progress hidden">
+        <div class="progress-label"></div>
+        <div class="bar"></div>
+    </div>
+    <span class="message hidden"></span>
+</div>
+<div class="span3">
+    <button class="btn btn-warning btn-small" id="btn-cancel"><i class="icon-remove"></i>Cancel</button>
+    <button class="btn btn-small" id="btn-clear">Clear</button>
+</div>
