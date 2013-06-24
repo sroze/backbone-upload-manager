@@ -77,6 +77,12 @@
                 
                 // Create the view
                 self.renderFile(file);
+            }).on('fileprogress', function (file, progress) {
+                file.progress(progress);
+            }).on('filefail', function (file, error) {
+                file.fail(error);
+            }).on('filedone', function (file, data) {
+                file.done(data.result);
             });
             
             // When collection changes
@@ -141,7 +147,7 @@
                 });
             }).on('fileuploadprogress', function (e, data) {
                 $.each(data.uploadManagerFiles, function (index, file) {
-                    file.progress(data);
+                    self.trigger('fileprogress', file, data);
                 });
             }).on('fileuploadfail', function (e, data) {
                 $.each(data.uploadManagerFiles, function (index, file) {
@@ -160,11 +166,11 @@
                         }
                     }
                     
-                    file.fail(error)
+                    self.trigger('filefail', file, error);
                 });
             }).on('fileuploaddone', function (e, data) {
                 $.each(data.uploadManagerFiles, function (index, file) {
-                    file.done(data.result);
+                    self.trigger('filedone', file, data);
                 });
             });
         },

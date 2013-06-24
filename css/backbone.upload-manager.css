@@ -2,6 +2,7 @@
     border: 1px solid #CCCCCC;
     border-radius: 4px 4px 4px 4px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    text-align: left;
 }
 .upload-manager footer {
     background: #F4F4F4;
