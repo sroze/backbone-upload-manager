@@ -27,26 +27,37 @@ class DefaultController extends Controller
      * Upload a new file.
      * 
      * @Route("/upload", name="file_upload")
-     * @Method("POST")
+     * @Method({"POST", "OPTIONS"})
      */
     public function uploadAction()
     {
         $this->clearFiles();
         
-        try {
-	        // Handle file uploads
-    	    $files = $this->get('srozeio.upload_handler')->handle(array(
-    	        'root_path' => $this->container->getParameter(Configuration::PARAMETER_UPLOAD_ROOT_DIR),
-    	        'param_name' => 'files'
-    	    ));
-    	    
-    	    // Return successfull response
-    	    return new JsonResponse($files);
-	    } catch (UploadException $e) {
-	        return new JsonResponse(array(
-	            'error' => $e->getMessage()
-	        ), 400);
-	    }
+        // Get request
+        $request = $this->getRequest();
+        if ($request->isMethod('POST')) {
+            try {
+    	        // Handle file uploads
+        	    $files = $this->get('srozeio.upload_handler')->handle(array(
+        	        'root_path' => $this->container->getParameter(Configuration::PARAMETER_UPLOAD_ROOT_DIR),
+        	        'param_name' => 'files'
+        	    ));
+        	    
+        	    // Return successfull response
+        	    $response = JsonResponse($files);
+    	    } catch (UploadException $e) {
+    	        $response = JsonResponse(array(
+    	            'error' => $e->getMessage()
+    	        ), 400);
+    	    }
+        } else {
+            $response = new JsonResponse(array('message' => 'OK'));
+        }
+        
+        // Set the cross domain header
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        
+        return $response;
     }
     
     /**
