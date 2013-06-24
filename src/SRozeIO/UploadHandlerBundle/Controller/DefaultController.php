@@ -24,6 +24,17 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 class DefaultController extends Controller
 {
     /**
+     * The index action, which redirects to GitHub pages 
+     * demonstration.
+     * 
+     * @Route("/")
+     */
+    public function indexAction ()
+    {
+        return $this->redirect('http://sroze.github.io/backbone-upload-manager/', 301);
+    }
+    
+    /**
      * Upload a new file.
      * 
      * @Route("/upload", name="file_upload")
