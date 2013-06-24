@@ -90,7 +90,7 @@
                         <script type="text/javascript">
                         $(function(){
 	                        // On file uploaded, refresh list.
-	                        window.uploadManager.on('uploaded', function () {
+	                        window.uploadManager.on('filedone', function () {
 	                            $.get('http://upload-manager.sroze.io/files').done(function(result){
 	                                var target = $('ul#file-list').empty();
 	                                
@@ -129,7 +129,7 @@ uploadManager.renderTo($('div#manager-area'));
                     <div class="span6">
 <pre class="prettyprint lang-javascript linenums">
 // On file uploaded, refresh list.
-uploadManager.on('uploaded', function () {
+uploadManager.on('filedone', function () {
     $.get('/files').done(function(result){
         var target = $('ul#file-list').empty();
         
