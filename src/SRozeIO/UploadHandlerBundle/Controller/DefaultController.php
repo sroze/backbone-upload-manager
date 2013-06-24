@@ -5,6 +5,7 @@ namespace SRozeIO\UploadHandlerBundle\Controller;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -65,10 +66,7 @@ class DefaultController extends Controller
             $response = new JsonResponse(array('message' => 'OK'));
         }
         
-        // Set the cross domain header
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        
-        return $response;
+        return $this->setAllowOriginHeader($response);
     }
     
     /**
@@ -95,7 +93,7 @@ class DefaultController extends Controller
             );
         }
         
-        return new JsonResponse($files);
+        return $this->setAllowOriginHeader(new JsonResponse($files));
     }
     
     /**
@@ -136,6 +134,20 @@ class DefaultController extends Controller
         $response->headers->set('Content-length', filesize($path));
         $response->headers->set('Content-Type', mime_content_type($path));
     
+        return $response;
+    }
+    
+    /**
+     * Set allow origin header in response.
+     * 
+     * @param Response $response
+     * @return Response
+     */
+    private function setAllowOriginHeader (Response $response)
+    {
+        // Set the cross domain header
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        
         return $response;
     }
     
