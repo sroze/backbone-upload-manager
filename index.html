@@ -86,7 +86,7 @@
                     <div class="span6">
                         <h2>Uploaded files</h2>
                         <p>Here are displayed the uploaded files on the server. The list is updated each time that a file is successfully uploaded.</p>
-                        <div id="files-area"></div>
+                        <ul id="file-list"></ul>
                         <script type="text/javascript">
                         $(function(){
 	                        // On file uploaded, refresh list.
@@ -96,7 +96,7 @@
 	                                
 	                                $.each(result, function (index, file) {
 	                                    target.append(
-	                                        '&lt;li&gt;'+file.name+' ('+file.size+')&lt;/li&gt;'
+	                                        '<li>'+file.name+' ('+file.size+' bytes) <a href="http://upload-manager.sroze.io'+file.download_url+'">Download</a></li>'
 	                                    );
 	                                });
 	                            });
@@ -135,7 +135,9 @@ uploadManager.on('filedone', function () {
         
         $.each(result, function (index, file) {
             target.append(
-                '&lt;li&gt;'+file.name+' ('+file.size+')&lt;/li&gt;'
+                '&lt;li&gt;'+file.name+' ('+file.size+' bytes) '+
+                '&lt;a href="'+file.download_url+'"&gt;Downlooad&lt;a&gt;'+
+                '&lt;/li&gt;'
             );
         });
     });

@@ -67,6 +67,10 @@
     margin: 60px 0 30px;
     text-align: center;
 }
+ul#file-list {
+	margin-top: 10px;
+	text-align: left;
+}
 pre {
 	text-align: left;
 	overflow: auto;
