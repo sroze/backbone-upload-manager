@@ -12,12 +12,15 @@
         <link href="assets/css/vendor/2-bootstrap-responsive-2.3.1.css" rel="stylesheet" />
         <link href="assets/css/vendor/3-prettify.css" rel="stylesheet" />
         <link href="assets/css/docs.css" rel="stylesheet" />
+        <link href="assets/css/backbone.upload-manager.css" rel="stylesheet" />
 
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
             <script src="assets/js/html5shiv.js"></script>
         <![endif]-->
         
+        <!-- Top scripts -->
+        <script type="text/javascript" src="assets/js/vendor/1-jquery-1.9.1.js"></script>
         <script type="text/javascript">
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -61,12 +64,45 @@
                     <div class="span6">
                         <h2>Upload Manager</h2>
                         <p>This is a demonstration of the backbone upload manager, based on <a href="http://backbonejs.org">Backbone.js</a> and <a href="https://github.com/blueimp/jQuery-File-Upload/wiki/Basic-plugin">jQuery Upload File Basic</a>.</p>
-                        <p><em>Waiting Google App Engine PHP</em></p>
+                        <div id="manager-area"></div>
+                        <script type="text/javascript">
+                        $(function(){
+                            Backbone.TemplateManager.baseUrl = 'templates/{name}';
+
+	                         // Create the upload manager
+	                         window.uploadManager = new Backbone.UploadManager({
+	                             'uploadUrl': 'http://upload-manager.sroze.io/upload',
+	                             'templates': {
+	                                 'main': 'upload-manager.main',
+	                                 'file': 'upload-manager.file'
+	                             }
+	                         });
+	
+	                         // Render it
+	                         uploadManager.renderTo($('div#manager-area'));
+                        });
+                        </script>
                     </div>
                     <div class="span6">
                         <h2>Uploaded files</h2>
                         <p>Here are displayed the uploaded files on the server. The list is updated each time that a file is successfully uploaded.</p>
-                        <p><em>Waiting Google App Engine PHP</em></p>
+                        <div id="files-area"></div>
+                        <script type="text/javascript">
+                        $(function(){
+	                        // On file uploaded, refresh list.
+	                        window.uploadManager.on('uploaded', function () {
+	                            $.get('http://upload-manager.sroze.io/files').done(function(result){
+	                                var target = $('ul#file-list').empty();
+	                                
+	                                $.each(result, function (index, file) {
+	                                    target.append(
+	                                        '&lt;li&gt;'+file.name+' ('+file.size+')&lt;/li&gt;'
+	                                    );
+	                                });
+	                            });
+	                        });
+                        });
+                        </script>
                     </div>
                 </div>
         
@@ -75,8 +111,16 @@
                 <div class="row-fluid">
                     <div class="span6">
 <pre class="prettyprint lang-javascript linenums">
+Backbone.TemplateManager.baseUrl = 'templates/{name}';
+
 // Create the upload manager
-var uploadManager = new Backbone.UploadManager();
+var uploadManager = new Backbone.UploadManager({
+    'uploadUrl': '/upload',
+    'templates': {
+        'main': 'upload-manager.main',
+        'file': 'upload-manager.file'
+    }
+});
 
 // Render it
 uploadManager.renderTo($('div#manager-area'));
@@ -89,11 +133,11 @@ uploadManager.on('uploaded', function () {
     $.get('/files').done(function(result){
         var target = $('ul#file-list').empty();
         
-        $.each(result, function (index, file)) {
+        $.each(result, function (index, file) {
             target.append(
                 '&lt;li&gt;'+file.name+' ('+file.size+')&lt;/li&gt;'
             );
-        }
+        });
     });
 });
 </pre>
@@ -110,8 +154,8 @@ uploadManager.on('uploaded', function () {
                 <div class="row-fluid">
                     <div class="span6">
                         <h2>Upload Handler</h2>
-                        <p>There's an <strong>upload handler</strong> coming with Backbone Upload Manager. It's just a simple PHP class that handles uploads.</p>
-                        <p><strong>Note:</strong> the demonstration handler is a Symfony2 application hosted on a PHP Google App Engine, that you can found in the <code>gae-handler</code> branch of GitHub repository.</p>
+                        <p>There's an <strong>upload handler</strong> coming with Backbone Upload Manager. It's just a simple PHP class that handles uploads that <a href="https://github.com/sroze/backbone-upload-manager/blob/gae-backend/src/SRozeIO/UploadHandlerBundle/Model/UploadHandler.php">you can find in the GitHub repository</a>.</p>
+                        <p><strong>Note:</strong> the demonstration handler is a Symfony2 application, that you can found in the <a href="https://github.com/sroze/backbone-upload-manager/tree/gae-backend"><code>gae-handler</code></a> branch of GitHub repository.</p>
                     </div>
                     <div class="span6">
                         <h2>Symfony2 integration</h2>
@@ -144,9 +188,16 @@ uploadManager.on('uploaded', function () {
             </div>
         </footer>
 
-        <script type="text/javascript" src="assets/js/vendor/1-jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/1-json2.js"></script>
         <script type="text/javascript" src="assets/js/vendor/2-bootstrap-2.3.1.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/2-underscore-1.4.4.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/3-backbone-1.0.0.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/4-backbone-defered-view-loader.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/8-jquery.iframe-transport.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/8-jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="assets/js/vendor/9-jquery.fileupload.js"></script>
         <script type="text/javascript" src="assets/js/vendor/prettify.js"></script>
         <script type="text/javascript" src="assets/js/docs.js"></script>
+        <script type="text/javascript" src="assets/js/backbone.upload-manager.js"></script>
     </body>
 </html>
