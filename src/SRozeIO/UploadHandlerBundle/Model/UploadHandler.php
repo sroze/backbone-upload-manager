@@ -36,14 +36,29 @@ class UploadHandler
         // For each file, handle it
         $files = array();
         foreach ($upload['tmp_name'] as $index => $value) {
-            $files[] = $this->handleFile(array(
+            $file = array(
                 'tmp_name' => $upload['tmp_name'][$index],
                 'name' => $upload['name'][$index],
                 'size' => $upload['size'][$index],
                 'type' => $upload['type'][$index],
                 'error' => $upload['error'][$index],
                 'index' => $index
-            ), $options);
+            );
+            
+            if ($file['error'] != UPLOAD_ERR_OK) {
+                switch ((int) $file['error']) {
+                    case UPLOAD_ERR_INI_SIZE:
+                        throw new UploadException("File size exceed 'upload_max_filesize' ini parameter");
+                    case UPLOAD_ERR_FORM_SIZE:
+                        throw new UploadException("File size exceed 'MAX_FILE_SIZE' form parameter");
+                    case UPLOAD_ERR_CANT_WRITE:
+                        throw new UploadException("Can write file");
+                    case UPLOAD_ERR_FORM_SIZE:
+                        throw new UploadException(sprintf("Unknown error (%d)", $file['error']));
+                }
+            } else {
+                $this->handleFile($file, $options);
+            }
         }
         
         return $files;
