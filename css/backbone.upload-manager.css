@@ -23,6 +23,22 @@
     overflow: hidden;
     position: relative;
 }
+.upload-manager .message.error {
+    color: #BD362F;
+}
+.upload-manager .message.done {
+    color: #57ba48;
+}
+.upload-manager div.progress {
+    position: relative;
+}
+.upload-manager div.progress div.progress-label {
+    position: absolute; 
+    width: 100%; 
+    text-align: center;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+    color: #fff;
+}
 .upload-manager i {
     background: url("../images/sprite.png");
     display: inline-block;

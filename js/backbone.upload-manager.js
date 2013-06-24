@@ -76,12 +76,21 @@
                 self.files.add(file);
                 
                 // Create the view
-                var file_view = new Backbone.UploadManager.FileView($.extend(self.options, {model: file}));
-                $('#file-list', self.el).append(file_view.deferedRender().el);
+                self.renderFile(file);
             });
             
             // When collection changes
             this.files.on('all', this.update, this);
+        },
+        
+        /**
+         * Render a file.
+         * 
+         */
+        renderFile: function (file)
+        {
+            var file_view = new Backbone.UploadManager.FileView($.extend(this.options, {model: file}));
+            $('#file-list', self.el).append(file_view.deferedRender().el);
         },
         
         /**
@@ -192,6 +201,11 @@
                     file.start();
                 });
             });
+            
+            // Render current files
+            $.each(this.files, function (i, file) {
+                self.renderFile(file);
+            });
         }
     }, {
         /**
@@ -199,6 +213,8 @@
          * 
          */
         File: Backbone.Model.extend({
+            state: "pending",
+            
             /**
              * Start upload.
              * 
@@ -207,6 +223,7 @@
             {
                 if (this.isPending()) {
                     this.get('processor').submit();
+                    this.state = "running";
                     
                     // Dispatch event
                     this.trigger('filestarted', this);
@@ -223,6 +240,7 @@
                 this.destroy();
                 
                 // Dispatch event
+                this.state = "canceled";
                 this.trigger('filecanceled', this);
             },
             
@@ -243,6 +261,7 @@
             fail: function (error)
             {
                 // Dispatch event
+                this.state = "error";
                 this.trigger('filefailed', error);
             },
             
@@ -253,6 +272,7 @@
             done: function (result)
             {
                 // Dispatch event
+                this.state = "error";
                 this.trigger('filedone', result);
             },
             
@@ -262,7 +282,7 @@
              */
             isPending: function ()
             {
-                return this.getState() == undefined || this.getState() == "pending";
+                return this.getState() == "pending";
             },
             
             /**
@@ -271,7 +291,7 @@
              */
             isRunning: function ()
             {
-                return !this.isPending() && !this.isDone();
+                return this.getState() == "running";
             },
             
             /**
@@ -280,7 +300,7 @@
              */
             isDone: function ()
             {
-                return this.getState() == "done" || this.isError();
+                return this.getState() == "done";
             },
             
             /**
@@ -289,7 +309,7 @@
              */
             isError: function ()
             {
-                return this.getState() == "rejected";
+                return this.getState() == "error" || this.getState == "canceled";
             },
             
             /**
@@ -298,7 +318,7 @@
              */
             getState: function ()
             {
-                return this.get('processor').state();
+                return this.state;
             }
         }),
         
@@ -397,7 +417,7 @@
                 } else if (this.model.isRunning()) {
                     when_pending.add(when_done).addClass('hidden');
                     when_running.removeClass('hidden');
-                } else if (this.model.isDone()) {
+                } else if (this.model.isDone() || this.model.isError()) {
                     when_pending.add(when_running).addClass('hidden');
                     when_done.removeClass('hidden');
                 }
