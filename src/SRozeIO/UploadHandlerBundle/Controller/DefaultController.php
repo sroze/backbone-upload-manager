@@ -55,9 +55,9 @@ class DefaultController extends Controller
         	    ));
         	    
         	    // Return successfull response
-        	    $response = JsonResponse($files);
+        	    $response = new JsonResponse($files);
     	    } catch (UploadException $e) {
-    	        $response = JsonResponse(array(
+    	        $response = new JsonResponse(array(
     	            'error' => $e->getMessage()
     	        ), 400);
     	    }
