@@ -5,6 +5,6 @@ namespace SRozeIO\UploadHandlerBundle\Exception;
  * An upload-related exception.
  *
  */
-class UploadException extends \Exception {
-
+class UploadException extends \Exception
+{
 }

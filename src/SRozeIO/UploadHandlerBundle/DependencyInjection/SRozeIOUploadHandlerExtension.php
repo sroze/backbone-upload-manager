@@ -21,7 +21,7 @@ class SRozeIOUploadHandlerExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        
+
         // Set upload directory parameter
         $container->setParameter(Configuration::PARAMETER_UPLOAD_ROOT_DIR, $config['upload_root_dir']);
 

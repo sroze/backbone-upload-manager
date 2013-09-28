@@ -13,7 +13,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     const PARAMETER_UPLOAD_ROOT_DIR = 'srozeio_upload_root_dir';
-    
+
     /**
      * {@inheritDoc}
      */

@@ -1,3 +1,3 @@
 # Backbone Upload Manager Backend
 
-In development.
+The actual PHP backend for Upload Manager demonstration.

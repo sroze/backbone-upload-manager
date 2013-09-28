@@ -25,63 +25,63 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 class DefaultController extends Controller
 {
     /**
-     * The index action, which redirects to GitHub pages 
+     * The index action, which redirects to GitHub pages
      * demonstration.
-     * 
+     *
      * @Route("/")
      */
     public function indexAction ()
     {
         return $this->redirect('http://sroze.github.io/backbone-upload-manager/', 301);
     }
-    
+
     /**
      * Upload a new file.
-     * 
+     *
      * @Route("/upload", name="file_upload")
      * @Method({"POST", "OPTIONS"})
      */
     public function uploadAction()
     {
         $this->clearFiles();
-        
+
         // Get request
         $request = $this->getRequest();
         if ($request->isMethod('POST')) {
             try {
-    	        // Handle file uploads
-        	    $files = $this->get('srozeio.upload_handler')->handle(array(
-        	        'root_path' => $this->container->getParameter(Configuration::PARAMETER_UPLOAD_ROOT_DIR),
-        	        'param_name' => 'files'
-        	    ));
-        	    
-        	    // Return successfull response
-        	    $response = new JsonResponse($files);
-    	    } catch (UploadException $e) {
-    	        $response = new JsonResponse(array(
-    	            'error' => $e->getMessage()
-    	        ), 400);
-    	    }
+                // Handle file uploads
+                $files = $this->get('srozeio.upload_handler')->handle(array(
+                    'root_path' => $this->container->getParameter(Configuration::PARAMETER_UPLOAD_ROOT_DIR),
+                    'param_name' => 'files'
+                ));
+
+                // Return successfull response
+                $response = new JsonResponse($files);
+            } catch (UploadException $e) {
+                $response = new JsonResponse(array(
+                    'error' => $e->getMessage()
+                ), 400);
+            }
         } else {
             $response = new JsonResponse(array('message' => 'OK'));
         }
-        
+
         return $this->setAllowOriginHeader($response);
     }
-    
+
     /**
      * List uploaded files.
-     * 
+     *
      * @Route("/files", name="file_list")
      * @Method("GET")
      */
     public function filesAction ()
     {
         $this->clearFiles();
-        
+
         $finder = $this->getFinder();
         $files = array();
-        
+
         foreach ($finder->files() as $file) {
             $files[] = array(
                 'name' => $file->getFilename(),
@@ -92,13 +92,13 @@ class DefaultController extends Controller
                 ))
             );
         }
-        
+
         return $this->setAllowOriginHeader(new JsonResponse($files));
     }
-    
+
     /**
      * Download an uploaded file.
-     * 
+     *
      * @Route("/file/{name}/download", name="file_download")
      * @Method("GET")
      * @param string $name
@@ -107,53 +107,53 @@ class DefaultController extends Controller
     {
         $root = $this->container->getParameter(Configuration::PARAMETER_UPLOAD_ROOT_DIR);
         $path = $root.$name;
-        
+
         if (!file_exists($path)) {
             throw new NotFoundHttpException(sprintf('No file found with name "%s"', $name));
         }
-        
+
         $stream = @fopen($path, 'r');
-        
+
         // Create Response object
         $response = new StreamedResponse(function() use ($stream) {
             if ($stream == false) {
                 throw new ServiceUnavailableHttpException(60, 'Unable to open file');
             }
-            	
+
             while (!feof($stream)) {
                 $buffer = fread($stream, 2048);
                 echo $buffer;
                 flush();
             }
-            	
+
             fclose($stream);
         });
-        
+
         // Set headers
         $response->headers->set('Content-disposition', 'attachment; filename='.$name);
         $response->headers->set('Content-length', filesize($path));
         $response->headers->set('Content-Type', mime_content_type($path));
-    
+
         return $response;
     }
-    
+
     /**
      * Set allow origin header in response.
-     * 
-     * @param Response $response
+     *
+     * @param  Response $response
      * @return Response
      */
     private function setAllowOriginHeader (Response $response)
     {
         // Set the cross domain header
         $response->headers->set('Access-Control-Allow-Origin', '*');
-        
+
         return $response;
     }
-    
+
     /**
      * Create a Finder instance to fetch the upload directory.
-     * 
+     *
      * @return Finder
      */
     private function getFinder ()
@@ -161,19 +161,19 @@ class DefaultController extends Controller
         $root = $this->container->getParameter(Configuration::PARAMETER_UPLOAD_ROOT_DIR);
         $finder = new Finder();
         $finder->in($root);
-        
+
         return $finder;
     }
-    
+
     /**
      * Clear files that was uploaded more than the last
      * five minutes.
-     * 
+     *
      */
     private function clearFiles ()
     {
         $finder = $this->getFinder();
-        
+
         // For each file modified
         foreach ($finder->files()->date('< now - 5 minutes') as $file) {
             unlink($file->getRealpath());
