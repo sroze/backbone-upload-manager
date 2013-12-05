@@ -38,10 +38,10 @@
          * Initialize upload manager options
          * 
          */
-        initialize: function () 
+        initialize: function (options) 
         {
             // Merge options
-            this.options = $.extend(this.defaults, this.options);
+            this.options = $.extend(this.defaults, options);
             
             // Update template name
             this.templateName = this.options.templates.main;
@@ -345,8 +345,8 @@
         FileView: Backbone.DeferedView.extend({
             className: 'upload-manager-file row-fluid',
             
-            initialize: function () {
-                this.templateName = this.options.templates.file;
+            initialize: function (options) {
+                this.templateName = options.templates.file;
                 
                 // Bind model events
                 this.model.on('destroy', this.close, this);
