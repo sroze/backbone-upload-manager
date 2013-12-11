@@ -53,6 +53,7 @@
             this.uploadProcess = $('<input id="fileupload" type="file" name="files[]" multiple="multiple">').fileupload({
                 dataType: 'json',
                 url: this.options.uploadUrl,
+                formData: this.options.formData,
                 autoUpload: this.options.autoUpload,
                 singleFileUploads: true
             });
