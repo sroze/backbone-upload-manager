@@ -143,7 +143,7 @@ class DefaultController extends Controller
      * @param  Response $response
      * @return Response
      */
-    private function setAllowOriginHeader (Response $response)
+    private function setAllowOriginHeader (JsonResponse $response)
     {
         // Set the cross domain header
         $response->headers->set('Access-Control-Allow-Origin', '*');
