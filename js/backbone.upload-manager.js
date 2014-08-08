@@ -349,6 +349,8 @@
 
             initialize: function (options) {
                 this.templateName = options.templates.file;
+                this.processUploadMsg = options.processUploadMsg;
+                this.doneMsg = options.doneMsg;
 
                 // Bind model events
                 this.model.on('destroy', this.close, this);
@@ -382,13 +384,15 @@
             updateProgress: function (progress)
             {
                 var percent = parseInt(progress.loaded / progress.total * 100, 10);
+                var progressHTML = this.getHelpers().displaySize(progress.loaded)+' of '+this.getHelpers().displaySize(progress.total);
+                if (percent >= 100 && this.processUploadMsg) { progressHTML = this.processUploadMsg; }
 
                 $('div.progress', this.el)
                     .find('.bar')
                     .css('width', percent+'%')
                     .parent()
                     .find('.progress-label')
-                    .html(this.getHelpers().displaySize(progress.loaded)+' of '+this.getHelpers().displaySize(progress.total));
+                    .html(progressHTML);
             },
 
             /**
@@ -406,7 +410,7 @@
              */
             hasDone: function (result)
             {
-                $('span.message', this.el).html('<i class="icon-success"></i> Uploaded');
+                $('span.message', this.el).html('<i class="icon-success"></i> ' + (this.doneMsg || 'Uploaded'));
             },
 
             /**
