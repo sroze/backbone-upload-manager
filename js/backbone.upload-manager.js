@@ -19,6 +19,9 @@
             },
             uploadUrl: '/upload',
             autoUpload: false,
+            fileUploadId: 'fileupload',
+            startUploadsId: 'start-uploads-button',
+            cancelUploadsId: 'cancel-uploads-button',
             dataType: 'json'
         },
 
@@ -51,7 +54,7 @@
             this.files = new Backbone.UploadManager.FileCollection();
 
             // Create the file-upload wrapper
-            this.uploadProcess = $('<input id="fileupload" type="file" name="files[]" multiple="multiple">').fileupload({
+            this.uploadProcess = $('<input id="' + this.options.fileUploadId + '" type="file" name="files[]" multiple="multiple">').fileupload({
                 dataType: this.options.dataType,
                 url: this.options.uploadUrl,
                 formData: this.options.formData,
@@ -107,7 +110,7 @@
          */
         update: function ()
         {
-            var with_files_elements = $('button#cancel-uploads-button, button#start-uploads-button', this.el);
+            var with_files_elements = $('button#' + this.options.cancelUploadsId + ', button#' + this.options.startUploadsId, this.el);
             var without_files_elements = $('#file-list .no-data', this.el);
             if (this.files.length > 0) {
                 with_files_elements.removeClass('hidden');
@@ -189,7 +192,7 @@
             this.update();
 
             // Add add files handler
-            var input = $('input#fileupload', this.el), self = this;
+            var input = $('input#' + this.options.fileUploadId, this.el), self = this;
             input.on('change', function (){
                 self.uploadProcess.fileupload('add', {
                     fileInput: $(this)
@@ -197,14 +200,14 @@
             });
 
             // Add cancel all handler
-            $('button#cancel-uploads-button', this.el).click(function(){
+            $('button#' + this.options.cancelUploadsId, this.el).click(function(){
                 while (self.files.length) {
                     self.files.at(0).cancel();
                 }
             });
 
             // Add start uploads handler
-            $('button#start-uploads-button', this.el).click(function(){
+            $('button#' + this.options.startUploadsId, this.el).click(function(){
                 self.files.each(function(file){
                     file.start();
                 });
