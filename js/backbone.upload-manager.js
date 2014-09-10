@@ -198,9 +198,9 @@
 
             // Add cancel all handler
             $('button#cancel-uploads-button', this.el).click(function(){
-                self.files.each(function(file){
-                    file.cancel();
-                });
+                while (self.files.length) {
+                    self.files.at(0).cancel();
+                }
             });
 
             // Add start uploads handler
