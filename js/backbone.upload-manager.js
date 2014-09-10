@@ -1,3 +1,4 @@
+
 /**
  * Backbone Upload Manager v1.0.0
  *
@@ -110,7 +111,7 @@
          */
         update: function ()
         {
-            var with_files_elements = $('button#' + this.options.cancelUploadsId + ', button#' + this.options.startUploadsId, this.el);
+            var with_files_elements = $('#' + this.options.cancelUploadsId + ', #' + this.options.startUploadsId, this.el);
             var without_files_elements = $('#file-list .no-data', this.el);
             if (this.files.length > 0) {
                 with_files_elements.removeClass('hidden');
@@ -192,7 +193,7 @@
             this.update();
 
             // Add add files handler
-            var input = $('input#' + this.options.fileUploadId, this.el), self = this;
+            var input = $('#' + this.options.fileUploadId, this.el), self = this;
             input.on('change', function (){
                 self.uploadProcess.fileupload('add', {
                     fileInput: $(this)
@@ -200,14 +201,14 @@
             });
 
             // Add cancel all handler
-            $('button#' + this.options.cancelUploadsId, this.el).click(function(){
+            $('#' + this.options.cancelUploadsId, this.el).click(function(){
                 while (self.files.length) {
                     self.files.at(0).cancel();
                 }
             });
 
             // Add start uploads handler
-            $('button#' + this.options.startUploadsId, this.el).click(function(){
+            $('#' + this.options.startUploadsId, this.el).click(function(){
                 self.files.each(function(file){
                     file.start();
                 });
@@ -390,7 +391,7 @@
                 var progressHTML = this.getHelpers().displaySize(progress.loaded)+' of '+this.getHelpers().displaySize(progress.total);
                 if (percent >= 100 && this.processUploadMsg) { progressHTML = this.processUploadMsg; }
 
-                $('div.progress', this.el)
+                $('.progress', this.el)
                     .find('.bar')
                     .css('width', percent+'%')
                     .parent()
@@ -404,7 +405,7 @@
              */
             hasFailed: function (error)
             {
-                $('span.message', this.el).html('<i class="icon-error"></i> '+error);
+                $('.message', this.el).html('<i class="icon-error"></i> '+error);
             },
 
             /**
@@ -413,7 +414,7 @@
              */
             hasDone: function (result)
             {
-                $('span.message', this.el).html('<i class="icon-success"></i> ' + (this.doneMsg || 'Uploaded'));
+                $('.message', this.el).html('<i class="icon-success"></i> ' + (this.doneMsg || 'Uploaded'));
             },
 
             /**
@@ -422,9 +423,9 @@
              */
             update: function ()
             {
-                var when_pending = $('span.size, button#btn-cancel', this.el),
-                    when_running = $('div.progress, button#btn-cancel', this.el),
-                    when_done = $('span.message, button#btn-clear', this.el);
+                var when_pending = $('.size, #btn-cancel', this.el),
+                    when_running = $('.progress, #btn-cancel', this.el),
+                    when_done = $('.message, #btn-clear', this.el);
 
                 if (this.model.isPending()) {
                     when_running.add(when_done).addClass('hidden');
@@ -447,14 +448,14 @@
                 var self = this;
 
                 // DOM events
-                $('button#btn-cancel', this.el).click(function(){
+                $('#btn-cancel', this.el).click(function(){
                     self.model.cancel();
                     self.collection.remove(self.model);
                 });
-                $('button#btn-clear', this.el).click(function(){
+                $('#btn-clear', this.el).click(function(){
                     self.model.destroy();
                     self.collection.remove(self.model);
-                })
+                });
             },
 
             /**
