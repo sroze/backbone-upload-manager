@@ -1,7 +1,11 @@
 .upload-manager {
     border: 1px solid #CCCCCC;
     border-radius: 4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px 4px 4px 4px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     text-align: left;
 }
 .upload-manager footer {
@@ -15,10 +19,16 @@
     font-size: 23px;
     margin: 0;
     opacity: 0;
+    -webkit-opacity: 0;
+    -moz-opacity: 0;
     position: absolute;
     right: 0;
     top: 0;
     transform: translate(-300px, 0px) scale(4);
+    -webkit-transform: translate(-300px, 0px) scale(4);
+    -moz-transform: translate(-300px, 0px) scale(4);
+    -ms-transform: translate(-300px, 0px) scale(4);
+    -o-transform: translate(-300px, 0px) scale(4);
 }
 .upload-manager .fileinput-button {
     overflow: hidden;
@@ -30,10 +40,10 @@
 .upload-manager .message.done {
     color: #57ba48;
 }
-.upload-manager div.progress {
+.upload-manager .progress {
     position: relative;
 }
-.upload-manager div.progress div.progress-label {
+.upload-manager .progress .progress-label {
     position: absolute; 
     width: 100%; 
     text-align: center;
@@ -48,22 +58,22 @@
     height: 16px;
     width: 16px;
 }
-.upload-manager i.icon-cancel {
+.upload-manager .icon-cancel {
     background-position: 0 0;
 }
-.upload-manager i.icon-start {
+.upload-manager .icon-start {
     background-position: -32px 0;
 }
-.upload-manager i.icon-plus {
+.upload-manager .icon-plus {
     background-position: -80px 0;
 }
-.upload-manager i.icon-error {
+.upload-manager .icon-error {
     background-position: -96px 0;
 }
-.upload-manager i.icon-success {
+.upload-manager .icon-success {
     background-position: -112px 0;
 }
-.upload-manager i.icon-remove {
+.upload-manager .icon-remove {
     background-position: -144px 0;
 }
 
