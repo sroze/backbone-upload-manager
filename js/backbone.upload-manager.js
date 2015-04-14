@@ -212,6 +212,7 @@
                 while (self.files.length) {
                     self.files.at(0).cancel();
                 }
+                // Max Wong: Cannot add same file after cancelled #21
                 self._clearPreviousAddFileInput();
             });
 
