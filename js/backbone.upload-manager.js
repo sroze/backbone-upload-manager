@@ -69,13 +69,6 @@
             // Add local events handlers
             this.bindLocal();
         },
-        // Max Wong: Cannot add same file after cancelled #21
-        _clearPreviousAddFileInput: function() {
-        	var self = this;
-        	var input = $('#' + self.options.fileUploadId);
-        	input.val('')
-        	
-        },
 
         /**
          * Bind local events.
@@ -212,8 +205,7 @@
                 while (self.files.length) {
                     self.files.at(0).cancel();
                 }
-                // Max Wong: Cannot add same file after cancelled #21
-                self._clearPreviousAddFileInput();
+                self.$('#' + self.options.fileUploadId).val('');
             });
 
             // Add start uploads handler
@@ -461,13 +453,13 @@
                     self.model.cancel();
                     // Max Wong: Cannot add same file after cancelled #21
                     // self.collection.remove(self.model); <== cause error
-                    self._clearPreviousAddFileInput();
+                    self.$('#' + self.options.fileUploadId).val('');
                 });
                 $('#btn-clear', this.el).click(function(){
                     self.model.destroy();
                     // Max Wong: Cannot add same file after cancelled #21
                     // self.collection.remove(self.model); <== cause error
-                    self._clearPreviousAddFileInput();
+                    self.$('#' + self.options.fileUploadId).val('');
                 });
             },
 
@@ -478,14 +470,6 @@
             computeData: function ()
             {
                 return $.extend(this.getHelpers(), this.model.get('data'));
-            },
-            
-            // Max Wong: Cannot add same file after cancelled #21
-            _clearPreviousAddFileInput: function() {
-            	var self = this;
-            	var input = $('#' + self.options.fileUploadId);
-            	input.val('')
-            	
             },
         })
     });
