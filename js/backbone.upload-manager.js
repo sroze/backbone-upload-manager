@@ -23,7 +23,9 @@
             fileUploadId: 'fileupload',
             startUploadsId: 'start-uploads-button',
             cancelUploadsId: 'cancel-uploads-button',
-            dataType: 'json'
+            dataType: 'json',
+            fileModelOptions: {},
+            fileCollectionOptions: {}
         },
 
         /**
@@ -52,7 +54,10 @@
             this.templateName = this.options.templates.main;
 
             // Create the file list
-            this.files = new Backbone.UploadManager.FileCollection();
+            this.files = new Backbone.UploadManager.FileCollection(
+                null,
+                this.options.fileCollectionOptions
+            );
 
             // Create the file-upload wrapper
             this.uploadProcess = $('<input id="' + this.options.fileUploadId + '" type="file" name="files[]" multiple="multiple">').fileupload({
@@ -101,7 +106,7 @@
          */
         renderFile: function (file)
         {
-            var file_view = new Backbone.UploadManager.FileView($.extend(this.options, {model: file}));
+            var file_view = new Backbone.UploadManager.FileView($.extend(this.options, {model: file, collection: this.files}));
             $('#file-list', self.el).append(file_view.deferedRender().el);
         },
 
@@ -140,10 +145,10 @@
                 $.each(data.files, function (index, file_data) {
                     // Create the file object
                     file_data.id = self.file_id++;
-                    var file = new Backbone.UploadManager.File({
+                    var file = new Backbone.UploadManager.File($.extend({
                         data: file_data,
                         processor: data
-                    });
+                    }, self.options.fileModelOptions));
 
                     // Add file in data
                     data.uploadManagerFiles.push(file);
@@ -283,6 +288,7 @@
              */
             done: function (result)
             {
+                this.set('id', result.id);
                 // Dispatch event
                 this.state = "error";
                 this.trigger('filedone', result);
@@ -340,7 +346,10 @@
          *
          */
         FileCollection: Backbone.Collection.extend({
-            model: this.File
+            model: this.File,
+            initialize: function(models, options) {
+                this.url = (options||{}).url || undefined;
+            }
         }),
 
         /**
