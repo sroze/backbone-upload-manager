@@ -220,7 +220,7 @@
             });
 
             // Render current files
-            $.each(this.files, function (i, file) {
+            $.each(this.files.models, function (i, file) {
                 self.renderFile(file);
             });
         }
