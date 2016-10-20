@@ -1,5 +1,5 @@
 /**
- * Backbone Upload Manager v1.0.4
+ * Backbone Upload Manager v1.0.6
  *
  * Copyright (c) 2013 Samuel ROZE
  *
@@ -450,5 +450,9 @@ define(function(require) {
                 self.renderFile(file);
             });
         }
+    }, {
+        File: File,
+        FileCollection: FileCollection,
+        FileView: FileView
     });
 });
