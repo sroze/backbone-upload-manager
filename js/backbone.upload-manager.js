@@ -1,5 +1,5 @@
 /**
- * Backbone Upload Manager v1.0.6
+ * Backbone Upload Manager v1.0.7
  *
  * Copyright (c) 2013 Samuel ROZE
  *
@@ -41,6 +41,7 @@ define(function(require) {
 
             // Dispatch event
             this.state = "canceled";
+            $("#fileupload").replaceWith($("#fileupload").val('').clone(true));
             this.trigger('filecanceled', this);
         },
 
