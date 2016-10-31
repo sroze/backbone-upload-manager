@@ -1,13 +1,245 @@
-
 /**
- * Backbone Upload Manager v1.0.0
+ * Backbone Upload Manager v1.0.7
  *
  * Copyright (c) 2013 Samuel ROZE
  *
  * License and more information at:
  * http://github.com/sroze/backbone-upload-manager
  */
-(function(Backbone){
+define(function(require) {
+    'use strict';
+    var $ = require('jquery'),
+        _ = require('underscore'),
+        Backbone = require('backbone');
+        require('blueimp-file-upload');
+        require('backbone-defered-view-loader');
+
+    var File = Backbone.Model.extend({
+        state: "pending",
+
+        /**
+         * Start upload.
+         *
+         */
+        start: function() {
+            if (this.isPending()) {
+                this.get('processor').submit();
+                this.state = "running";
+
+                // Dispatch event
+                this.trigger('filestarted', this);
+            }
+        },
+
+        /**
+         * Cancel a file upload.
+         *
+         */
+        cancel: function() {
+            this.get('processor').abort();
+            this.destroy();
+
+            // Dispatch event
+            this.state = "canceled";
+            $("#fileupload").replaceWith($("#fileupload").val('').clone(true));
+            this.trigger('filecanceled', this);
+        },
+
+        /**
+         * Notify file that progress updated.
+         *
+         */
+        progress: function(data) {
+            //Clear input filename immediately after start for repeated upload 
+            $("#fileupload").val(null);
+            // Dispatch event
+            this.trigger('fileprogress', this.get('processor').progress());
+        },
+
+        /**
+         * Notify file that upload failed.
+         *
+         */
+        fail: function(error) {
+            // Dispatch event
+            this.state = "error";
+            this.trigger('filefailed', error);
+        },
+
+        /**
+         * Notify file that upload is done.
+         *
+         */
+        done: function(result) {
+            this.set('id', result.id);
+            // Dispatch event
+            this.state = "error";
+            this.trigger('filedone', result);
+        },
+
+        /**
+         * Is this file pending to be uploaded ?
+         *
+         */
+        isPending: function() {
+            return this.getState() == "pending";
+        },
+
+        /**
+         * Is this file currently uploading ?
+         *
+         */
+        isRunning: function() {
+            return this.getState() == "running";
+        },
+
+        /**
+         * Is this file uploaded ?
+         *
+         */
+        isDone: function() {
+            return this.getState() == "done";
+        },
+
+        /**
+         * Is this upload in error ?
+         *
+         */
+        isError: function() {
+            return this.getState() == "error" || this.getState == "canceled";
+        },
+
+        /**
+         * Get the file state.
+         *
+         */
+        getState: function() {
+            return this.state;
+        }
+    });
+
+    var FileCollection = Backbone.Collection.extend({
+        model: File,
+        initialize: function(models, options) {
+            this.url = (options || {}).url || undefined;
+        }
+    });
+
+    var FileView = Backbone.DeferedView.extend({
+        className: 'upload-manager-file row-fluid',
+
+        initialize: function(options) {
+            this.templateName = options.templates.file;
+            this.processUploadMsg = options.processUploadMsg;
+            this.doneMsg = options.doneMsg;
+
+            // Bind model events
+            this.model.on('destroy', this.close, this);
+            this.model.on('fileprogress', this.updateProgress, this);
+            this.model.on('filefailed', this.hasFailed, this);
+            this.model.on('filedone', this.hasDone, this);
+
+            // In each case, update view
+            this.model.on('all', this.update, this);
+        },
+
+        /**
+         * Render the file item view.
+         *
+         */
+        render: function() {
+            $(this.el).html(this.template(this.computeData()));
+
+            // Bind events
+            this.bindEvents();
+
+            // Update elements
+            this.update();
+        },
+
+        /**
+         * Update upload progress.
+         *
+         */
+        updateProgress: function(progress) {
+            var percent = parseInt(progress.loaded / progress.total * 100, 10);
+            var progressHTML = this.getHelpers().displaySize(progress.loaded) + ' of ' + this.getHelpers().displaySize(progress.total);
+            if (percent >= 100 && this.processUploadMsg) {
+                progressHTML = this.processUploadMsg;
+            }
+
+            $('.progress', this.el)
+                .find('.bar')
+                .css('width', percent + '%')
+                .parent()
+                .find('.progress-label')
+                .html(progressHTML);
+        },
+
+        /**
+         * File upload has failed.
+         *
+         */
+        hasFailed: function(error) {
+            $('.message', this.el).html('<i class="icon-error"></i> ' + error);
+        },
+
+        /**
+         * File upload is done.
+         *
+         */
+        hasDone: function(result) {
+            $('.message', this.el).html('<i class="icon-success"></i> ' + (this.doneMsg || 'Uploaded'));
+        },
+
+        /**
+         * Update view without complete rendering.
+         *
+         */
+        update: function() {
+            var when_pending = $('.size, #btn-cancel', this.el),
+                when_running = $('.progress, #btn-cancel', this.el),
+                when_done = $('.message, #btn-clear', this.el);
+
+            if (this.model.isPending()) {
+                when_running.add(when_done).addClass('hidden');
+                when_pending.removeClass('hidden');
+            } else if (this.model.isRunning()) {
+                when_pending.add(when_done).addClass('hidden');
+                when_running.removeClass('hidden');
+            } else if (this.model.isDone() || this.model.isError()) {
+                when_pending.add(when_running).addClass('hidden');
+                when_done.removeClass('hidden');
+            }
+        },
+
+        /**
+         * Bind local elements events.
+         *
+         */
+        bindEvents: function() {
+            var self = this;
+
+            // DOM events
+            $('#btn-cancel', this.el).click(function() {
+                self.model.cancel();
+                self.collection.remove(self.model);
+            });
+            $('#btn-clear', this.el).click(function() {
+                self.model.destroy();
+                self.collection.remove(self.model);
+            });
+        },
+
+        /**
+         * Compute data to be passed to the view.
+         *
+         */
+        computeData: function() {
+            return $.extend(this.getHelpers(), this.model.get('data'));
+        }
+    });
+
     Backbone.UploadManager = Backbone.DeferedView.extend({
         /**
          * Default options, that will be merged with the passed.
@@ -23,7 +255,9 @@
             fileUploadId: 'fileupload',
             startUploadsId: 'start-uploads-button',
             cancelUploadsId: 'cancel-uploads-button',
-            dataType: 'json'
+            dataType: 'json',
+            fileModelOptions: {},
+            fileCollectionOptions: {}
         },
 
         /**
@@ -43,16 +277,17 @@
          * Initialize upload manager options
          *
          */
-        initialize: function (options)
-        {
+        initialize: function(options) {
             // Merge options
             this.options = $.extend(this.defaults, options);
 
             // Update template name
             this.templateName = this.options.templates.main;
 
-            // Create the file list
-            this.files = new Backbone.UploadManager.FileCollection();
+            this.files = new FileCollection(
+                null,
+                this.options.fileCollectionOptions
+            );
 
             // Create the file-upload wrapper
             this.uploadProcess = $('<input id="' + this.options.fileUploadId + '" type="file" name="files[]" multiple="multiple">').fileupload({
@@ -74,20 +309,19 @@
          * Bind local events.
          *
          */
-        bindLocal: function ()
-        {
+        bindLocal: function() {
             var self = this;
-            this.on('fileadd', function (file) {
+            this.on('fileadd', function(file) {
                 // Add it to current list
                 self.files.add(file);
 
                 // Create the view
                 self.renderFile(file);
-            }).on('fileprogress', function (file, progress) {
+            }).on('fileprogress', function(file, progress) {
                 file.progress(progress);
-            }).on('filefail', function (file, error) {
+            }).on('filefail', function(file, error) {
                 file.fail(error);
-            }).on('filedone', function (file, data) {
+            }).on('filedone', function(file, data) {
                 file.done(data.result);
             });
 
@@ -99,9 +333,11 @@
          * Render a file.
          *
          */
-        renderFile: function (file)
-        {
-            var file_view = new Backbone.UploadManager.FileView($.extend(this.options, {model: file}));
+        renderFile: function(file) {
+            var file_view = new FileView($.extend(this.options, {
+                model: file,
+                collection: this.files
+            }));
             $('#file-list', self.el).append(file_view.deferedRender().el);
         },
 
@@ -109,8 +345,7 @@
          * Update the view without full rendering.
          *
          */
-        update: function ()
-        {
+        update: function() {
             var with_files_elements = $('#' + this.options.cancelUploadsId + ', #' + this.options.startUploadsId, this.el);
             var without_files_elements = $('#file-list .no-data', this.el);
             if (this.files.length > 0) {
@@ -126,10 +361,9 @@
          * Bind events on the upload processor.
          *
          */
-        bindProcessEvents: function ()
-        {
+        bindProcessEvents: function() {
             var self = this;
-            this.uploadProcess.on('fileuploadadd', function (e, data) {
+            this.uploadProcess.on('fileuploadadd', function(e, data) {
                 // Create an array in which the file objects
                 // will be stored.
                 data.uploadManagerFiles = [];
@@ -137,13 +371,13 @@
                 // A file is added, process for each file.
                 // Note: every times, the data.files array length is 1 because
                 //       of "singleFileUploads" option.
-                $.each(data.files, function (index, file_data) {
+                $.each(data.files, function(index, file_data) {
                     // Create the file object
                     file_data.id = self.file_id++;
-                    var file = new Backbone.UploadManager.File({
+                    var file = new File($.extend({
                         data: file_data,
                         processor: data
-                    });
+                    }, self.options.fileModelOptions));
 
                     // Add file in data
                     data.uploadManagerFiles.push(file);
@@ -151,12 +385,12 @@
                     // Trigger event
                     self.trigger('fileadd', file);
                 });
-            }).on('fileuploadprogress', function (e, data) {
-                $.each(data.uploadManagerFiles, function (index, file) {
+            }).on('fileuploadprogress', function(e, data) {
+                $.each(data.uploadManagerFiles, function(index, file) {
                     self.trigger('fileprogress', file, data);
                 });
-            }).on('fileuploadfail', function (e, data) {
-                $.each(data.uploadManagerFiles, function (index, file) {
+            }).on('fileuploadfail', function(e, data) {
+                $.each(data.uploadManagerFiles, function(index, file) {
                     var error = "Unknown error";
                     if (typeof data.errorThrown == "string") {
                         error = data.errorThrown;
@@ -174,8 +408,8 @@
 
                     self.trigger('filefail', file, error);
                 });
-            }).on('fileuploaddone', function (e, data) {
-                $.each(data.uploadManagerFiles, function (index, file) {
+            }).on('fileuploaddone', function(e, data) {
+                $.each(data.uploadManagerFiles, function(index, file) {
                     self.trigger('filedone', file, data);
                 });
             });
@@ -185,287 +419,43 @@
          * Render the main part of upload manager.
          *
          */
-        render: function ()
-        {
+        render: function() {
             $(this.el).html(this.template());
 
             // Update view
             this.update();
 
             // Add add files handler
-            var input = $('#' + this.options.fileUploadId, this.el), self = this;
-            input.on('change', function (){
+            var input = $('#' + this.options.fileUploadId, this.el),
+                self = this;
+            input.on('change', function() {
                 self.uploadProcess.fileupload('add', {
                     fileInput: $(this)
                 });
             });
 
             // Add cancel all handler
-            $('#' + this.options.cancelUploadsId, this.el).click(function(){
+            $('#' + this.options.cancelUploadsId, this.el).click(function() {
                 while (self.files.length) {
                     self.files.at(0).cancel();
                 }
             });
 
             // Add start uploads handler
-            $('#' + this.options.startUploadsId, this.el).click(function(){
-                self.files.each(function(file){
+            $('#' + this.options.startUploadsId, this.el).click(function() {
+                self.files.each(function(file) {
                     file.start();
                 });
             });
 
             // Render current files
-            $.each(this.files, function (i, file) {
+            $.each(this.files.models, function(i, file) {
                 self.renderFile(file);
             });
         }
     }, {
-        /**
-         * This model represents a file.
-         *
-         */
-        File: Backbone.Model.extend({
-            state: "pending",
-
-            /**
-             * Start upload.
-             *
-             */
-            start: function ()
-            {
-                if (this.isPending()) {
-                    this.get('processor').submit();
-                    this.state = "running";
-
-                    // Dispatch event
-                    this.trigger('filestarted', this);
-                }
-            },
-
-            /**
-             * Cancel a file upload.
-             *
-             */
-            cancel: function ()
-            {
-                this.get('processor').abort();
-                this.destroy();
-
-                // Dispatch event
-                this.state = "canceled";
-                this.trigger('filecanceled', this);
-            },
-
-            /**
-             * Notify file that progress updated.
-             *
-             */
-            progress: function (data)
-            {
-                // Dispatch event
-                this.trigger('fileprogress', this.get('processor').progress());
-            },
-
-            /**
-             * Notify file that upload failed.
-             *
-             */
-            fail: function (error)
-            {
-                // Dispatch event
-                this.state = "error";
-                this.trigger('filefailed', error);
-            },
-
-            /**
-             * Notify file that upload is done.
-             *
-             */
-            done: function (result)
-            {
-                // Dispatch event
-                this.state = "error";
-                this.trigger('filedone', result);
-            },
-
-            /**
-             * Is this file pending to be uploaded ?
-             *
-             */
-            isPending: function ()
-            {
-                return this.getState() == "pending";
-            },
-
-            /**
-             * Is this file currently uploading ?
-             *
-             */
-            isRunning: function ()
-            {
-                return this.getState() == "running";
-            },
-
-            /**
-             * Is this file uploaded ?
-             *
-             */
-            isDone: function ()
-            {
-                return this.getState() == "done";
-            },
-
-            /**
-             * Is this upload in error ?
-             *
-             */
-            isError: function ()
-            {
-                return this.getState() == "error" || this.getState == "canceled";
-            },
-
-            /**
-             * Get the file state.
-             *
-             */
-            getState: function ()
-            {
-                return this.state;
-            }
-        }),
-
-        /**
-         * This is a file collection, used to manage the selected
-         * and processing files.
-         *
-         */
-        FileCollection: Backbone.Collection.extend({
-            model: this.File
-        }),
-
-        /**
-         * A file view, which is the view that manage a single file
-         * process in the upload manager.
-         *
-         */
-        FileView: Backbone.DeferedView.extend({
-            className: 'upload-manager-file row-fluid',
-
-            initialize: function (options) {
-                this.templateName = options.templates.file;
-                this.processUploadMsg = options.processUploadMsg;
-                this.doneMsg = options.doneMsg;
-
-                // Bind model events
-                this.model.on('destroy', this.close, this);
-                this.model.on('fileprogress', this.updateProgress, this);
-                this.model.on('filefailed', this.hasFailed, this);
-                this.model.on('filedone', this.hasDone, this);
-
-                // In each case, update view
-                this.model.on('all', this.update, this);
-            },
-
-            /**
-             * Render the file item view.
-             *
-             */
-            render: function ()
-            {
-                $(this.el).html(this.template(this.computeData()));
-
-                // Bind events
-                this.bindEvents();
-
-                // Update elements
-                this.update();
-            },
-
-            /**
-             * Update upload progress.
-             *
-             */
-            updateProgress: function (progress)
-            {
-                var percent = parseInt(progress.loaded / progress.total * 100, 10);
-                var progressHTML = this.getHelpers().displaySize(progress.loaded)+' of '+this.getHelpers().displaySize(progress.total);
-                if (percent >= 100 && this.processUploadMsg) { progressHTML = this.processUploadMsg; }
-
-                $('.progress', this.el)
-                    .find('.bar')
-                    .css('width', percent+'%')
-                    .parent()
-                    .find('.progress-label')
-                    .html(progressHTML);
-            },
-
-            /**
-             * File upload has failed.
-             *
-             */
-            hasFailed: function (error)
-            {
-                $('.message', this.el).html('<i class="icon-error"></i> '+error);
-            },
-
-            /**
-             * File upload is done.
-             *
-             */
-            hasDone: function (result)
-            {
-                $('.message', this.el).html('<i class="icon-success"></i> ' + (this.doneMsg || 'Uploaded'));
-            },
-
-            /**
-             * Update view without complete rendering.
-             *
-             */
-            update: function ()
-            {
-                var when_pending = $('.size, #btn-cancel', this.el),
-                    when_running = $('.progress, #btn-cancel', this.el),
-                    when_done = $('.message, #btn-clear', this.el);
-
-                if (this.model.isPending()) {
-                    when_running.add(when_done).addClass('hidden');
-                    when_pending.removeClass('hidden');
-                } else if (this.model.isRunning()) {
-                    when_pending.add(when_done).addClass('hidden');
-                    when_running.removeClass('hidden');
-                } else if (this.model.isDone() || this.model.isError()) {
-                    when_pending.add(when_running).addClass('hidden');
-                    when_done.removeClass('hidden');
-                }
-            },
-
-            /**
-             * Bind local elements events.
-             *
-             */
-            bindEvents: function ()
-            {
-                var self = this;
-
-                // DOM events
-                $('#btn-cancel', this.el).click(function(){
-                    self.model.cancel();
-                    self.collection.remove(self.model);
-                });
-                $('#btn-clear', this.el).click(function(){
-                    self.model.destroy();
-                    self.collection.remove(self.model);
-                });
-            },
-
-            /**
-             * Compute data to be passed to the view.
-             *
-             */
-            computeData: function ()
-            {
-                return $.extend(this.getHelpers(), this.model.get('data'));
-            }
-        })
+        File: File,
+        FileCollection: FileCollection,
+        FileView: FileView
     });
-})(Backbone);
+});
