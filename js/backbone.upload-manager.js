@@ -50,6 +50,8 @@ define(function(require) {
          *
          */
         progress: function(data) {
+            //Clear input filename immediately after start for repeated upload 
+            $("#fileupload").val(null);
             // Dispatch event
             this.trigger('fileprogress', this.get('processor').progress());
         },
